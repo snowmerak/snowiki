@@ -27,6 +27,9 @@ func main() {
 		}
 	}
 	publicPath := filepath.Join(".", "public")
+	if err := os.RemoveAll(publicPath); err != nil {
+		log.Fatal(err)
+	}
 	if err := os.MkdirAll(publicPath, 0755); err != nil {
 		log.Fatal(err)
 	}
