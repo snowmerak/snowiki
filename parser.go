@@ -70,6 +70,9 @@ func startParser(input <-chan string, output chan<- parsed) {
 				if strings.HasPrefix(content, "#") {
 					content = strings.TrimLeft(content, "#")
 					if content != "" {
+						content = strings.TrimRightFunc(content, func(r rune) bool {
+							return r == ' ' || r == '\t' || r == '\n' || r == '\r'
+						})
 						hashtags = append(hashtags, content)
 					}
 				}
