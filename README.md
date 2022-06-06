@@ -1,2 +1,2 @@
-# simple-wiki
+# snowiki
 

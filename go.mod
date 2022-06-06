@@ -1,4 +1,4 @@
-module simple-wiki
+module github.com/snowmerak/snowiki
 
 go 1.18
 
