@@ -34,6 +34,7 @@ func makeTagsPage() {
 	if _, err := fmt.Fprintf(file, template, "Tags", sb.String()); err != nil {
 		log.Fatal(err)
 	}
+	siteMap = append(siteMap, "tags.html")
 }
 
 func makeEachTagPage() {
@@ -53,5 +54,6 @@ func makeEachTagPage() {
 		if _, err := fmt.Fprintf(file, subTemplate, tag, sb.String()); err != nil {
 			log.Fatal(err)
 		}
+		siteMap = append(siteMap, fmt.Sprintf("tags/%s.html", tag))
 	}
 }

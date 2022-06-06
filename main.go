@@ -19,6 +19,7 @@ var file_ThirdPartyLicenses []byte
 
 func main() {
 	wikiName := os.Getenv("WIKI_NAME")
+	siteDomain := os.Getenv("SITE_DOMAIN")
 
 	dirs, err := os.ReadDir(filepath.Join(".", "src"))
 	if err != nil {
@@ -77,6 +78,7 @@ func main() {
 		}
 		file.WriteString("\n<!-- Third Party Licenses : /THIRD_PARTY_LICENSES.md -->")
 		file.Close()
+		siteMap = append(siteMap, name)
 	}
 	{
 		fmt.Println("create water.css")
@@ -122,6 +124,10 @@ func main() {
 			log.Fatal(err)
 		}
 		file.Close()
+	}
+	{
+		fmt.Println("create sitemap.txt file")
+		makeSiteMap(siteDomain)
 	}
 	fmt.Println("Done")
 }
