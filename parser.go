@@ -22,66 +22,59 @@ type parsed struct {
 	name     string
 	data     []byte
 	hashtags []string
-	err      error
 }
 
-func startParser(input <-chan string, output chan<- parsed) {
-	for name := range input {
-		data, err := os.ReadFile(name)
-		if err != nil {
-			output <- parsed{err: err}
-			continue
-		}
-		buf := bytes.NewBuffer(nil)
-		mdParser := goldmark.New(
-			goldmark.WithParserOptions(parser.WithAutoHeadingID()),
-			goldmark.WithExtensions(
-				extension.GFM,
-				&hashtag.Extender{},
-				&mermaid.Extender{},
-				embed.New(),
-				&toc.Extender{},
-				highlighting.NewHighlighting(
-					highlighting.WithStyle("monokai"),
-					highlighting.WithFormatOptions(
-						html.WithLineNumbers(true),
-					),
+func parse(name string) (parsed, error) {
+	data, err := os.ReadFile(name)
+	if err != nil {
+		return parsed{}, err
+	}
+	buf := bytes.NewBuffer(nil)
+	mdParser := goldmark.New(
+		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+		goldmark.WithExtensions(
+			extension.GFM,
+			&hashtag.Extender{},
+			&mermaid.Extender{},
+			embed.New(),
+			&toc.Extender{},
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("monokai"),
+				highlighting.WithFormatOptions(
+					html.WithLineNumbers(true),
 				),
 			),
-		)
-		if err := mdParser.Convert(data, buf); err != nil {
-			output <- parsed{err: err}
-			continue
+		),
+	)
+	if err := mdParser.Convert(data, buf); err != nil {
+		return parsed{}, err
+	}
+	file, err := os.Open(name)
+	if err != nil {
+		return parsed{}, err
+	}
+	scanner := bufio.NewReader(file)
+	var hashtags []string
+	for {
+		line, err := scanner.ReadString('\n')
+		if err != nil && err != io.EOF {
+			return parsed{}, err
 		}
-		file, err := os.Open(name)
-		if err != nil {
-			output <- parsed{err: err}
-			continue
-		}
-		scanner := bufio.NewReader(file)
-		var hashtags []string
-		for {
-			line, err := scanner.ReadString('\n')
-			if err != nil && err != io.EOF {
-				output <- parsed{err: err}
-			}
-			contents := strings.Split(line, " ")
-			for _, content := range contents {
-				if strings.HasPrefix(content, "#") {
-					content = strings.TrimLeft(content, "#")
-					if content != "" {
-						content = strings.TrimRightFunc(content, func(r rune) bool {
-							return r == ' ' || r == '\t' || r == '\n' || r == '\r'
-						})
-						hashtags = append(hashtags, content)
-					}
+		contents := strings.Split(line, " ")
+		for _, content := range contents {
+			if strings.HasPrefix(content, "#") {
+				content = strings.TrimLeft(content, "#")
+				if content != "" {
+					content = strings.TrimRightFunc(content, func(r rune) bool {
+						return r == ' ' || r == '\t' || r == '\n' || r == '\r'
+					})
+					hashtags = append(hashtags, content)
 				}
 			}
-			if err == io.EOF {
-				break
-			}
 		}
-		output <- parsed{data: buf.Bytes(), hashtags: hashtags, name: name}
+		if err == io.EOF {
+			break
+		}
 	}
-	close(output)
+	return parsed{data: buf.Bytes(), hashtags: hashtags, name: name}, nil
 }

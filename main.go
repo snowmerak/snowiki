@@ -9,30 +9,28 @@ import (
 )
 
 func main() {
-	input := make(chan string)
-	output := make(chan parsed)
-	go startParser(input, output)
 	dirs, err := os.ReadDir(filepath.Join(".", "src"))
 	if err != nil {
 		log.Fatal(err)
 	}
+	parseds := make([]parsed, 0, len(dirs))
 	for _, dir := range dirs {
 		if dir.IsDir() {
 			continue
 		}
 		if strings.HasSuffix(dir.Name(), ".md") {
-			input <- filepath.Join(".", "src", dir.Name())
+			parsed, err := parse(filepath.Join(".", "src", dir.Name()))
+			if err != nil {
+				log.Fatal(err)
+			}
+			parseds = append(parseds, parsed)
 		}
 	}
-	close(input)
 	publicPath := filepath.Join(".", "public")
 	if err := os.MkdirAll(publicPath, 0755); err != nil {
 		log.Fatal(err)
 	}
-	for p := range output {
-		if p.err != nil {
-			log.Fatal(p.err)
-		}
+	for _, p := range parseds {
 		name := strings.TrimSuffix(filepath.Base(p.name), ".md") + ".html"
 		fmt.Printf("Create %s\n", name)
 		for _, tag := range p.hashtags {
