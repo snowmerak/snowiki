@@ -9,6 +9,7 @@ const template = `
 <button onclick="location.href='./index.html'">index</button>
 <button onclick="location.href='./tags.html'">tags</button>
 </div>%s</body></html>
+<!-- Third Party Licenses : /THIRD_PARTY_LICENSES.md -->
 `
 
 const subTemplate = `
@@ -20,4 +21,5 @@ const subTemplate = `
 <button onclick="location.href='../index.html'">index</button>
 <button onclick="location.href='../tags.html'">tags</button>
 </div>%s</body></html>
+<!-- Third Party Licenses : /THIRD_PARTY_LICENSES.md -->
 `

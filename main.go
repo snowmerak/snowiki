@@ -1,12 +1,21 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/tdewolff/minify/v2"
+	"github.com/tdewolff/minify/v2/css"
+	"github.com/tdewolff/minify/v2/html"
 )
+
+//go:embed THIRD_PARTY_LICENSES.md
+var file_ThirdPartyLicenses []byte
 
 func main() {
 	dirs, err := os.ReadDir(filepath.Join(".", "src"))
@@ -33,6 +42,14 @@ func main() {
 	if err := os.MkdirAll(publicPath, 0755); err != nil {
 		log.Fatal(err)
 	}
+
+	// Initialize minifier
+	m := minify.New()
+	m.AddFunc("text/css", css.Minify)
+	m.AddFunc("text/html", html.Minify)
+
+	var buf bytes.Buffer
+
 	for _, p := range parseds {
 		name := strings.TrimSuffix(filepath.Base(p.name), ".md") + ".html"
 		fmt.Printf("Create %s\n", name)
@@ -43,7 +60,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if _, err := fmt.Fprintf(file, template, p.data); err != nil {
+		// Minify HTML
+		buf.Reset()
+		if _, err := fmt.Fprintf(&buf, template, p.data); err != nil {
+			log.Fatal(err)
+		}
+		err = m.Minify("text/html", file, &buf)
+		if err != nil {
 			log.Fatal(err)
 		}
 		file.Close()
@@ -70,6 +93,17 @@ func main() {
 	{
 		fmt.Println("create each tag pages")
 		makeEachTagPage()
+	}
+	{
+		// Create THIRD_PARTY_LICENSES.md
+		file, err := os.Create(filepath.Join(publicPath, "THIRD_PARTY_LICENSES.md"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		if _, err := file.Write(file_ThirdPartyLicenses); err != nil {
+			log.Fatal(err)
+		}
+		file.Close()
 	}
 	fmt.Println("Done")
 }
