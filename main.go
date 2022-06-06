@@ -18,6 +18,8 @@ import (
 var file_ThirdPartyLicenses []byte
 
 func main() {
+	wikiName := os.Getenv("WIKI_NAME")
+
 	dirs, err := os.ReadDir(filepath.Join(".", "src"))
 	if err != nil {
 		log.Fatal(err)
@@ -62,7 +64,11 @@ func main() {
 		}
 		// Minify HTML
 		buf.Reset()
-		if _, err := fmt.Fprintf(&buf, template, p.data); err != nil {
+		title := strings.TrimSuffix(name, ".html")
+		if title == "index" && wikiName != "" {
+			title = wikiName
+		}
+		if _, err := fmt.Fprintf(&buf, template, title, p.data); err != nil {
 			log.Fatal(err)
 		}
 		err = m.Minify("text/html", file, &buf)

@@ -31,7 +31,7 @@ func makeTagsPage() {
 		sb.WriteString(button)
 	}
 	sb.WriteString(`</div>`)
-	if _, err := fmt.Fprintf(file, template, sb.String()); err != nil {
+	if _, err := fmt.Fprintf(file, template, "Tags", sb.String()); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -50,7 +50,7 @@ func makeEachTagPage() {
 			sb.WriteString(fmt.Sprintf(`<button onclick="location.href='../%s'">%s</button>`, name, strings.TrimSuffix(name, ".html")))
 		}
 		sb.WriteString(`</div>`)
-		if _, err := fmt.Fprintf(file, subTemplate, sb.String()); err != nil {
+		if _, err := fmt.Fprintf(file, subTemplate, tag, sb.String()); err != nil {
 			log.Fatal(err)
 		}
 	}
