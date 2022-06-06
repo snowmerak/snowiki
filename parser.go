@@ -19,6 +19,7 @@ import (
 )
 
 type parsed struct {
+	name     string
 	data     []byte
 	hashtags []string
 	err      error
@@ -77,7 +78,7 @@ func startParser(input <-chan string, output chan<- parsed) {
 				break
 			}
 		}
-		output <- parsed{data: buf.Bytes(), hashtags: hashtags}
+		output <- parsed{data: buf.Bytes(), hashtags: hashtags, name: name}
 	}
 	close(output)
 }
