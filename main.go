@@ -69,6 +69,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		file.WriteString("\n<!-- Third Party Licenses : /THIRD_PARTY_LICENSES.md -->")
 		file.Close()
 	}
 	{
