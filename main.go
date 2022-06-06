@@ -112,5 +112,16 @@ func main() {
 		}
 		file.Close()
 	}
+	{
+		fmt.Println("create robots.txt file")
+		file, err := os.Create(filepath.Join(publicPath, "robots.txt"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		if _, err := file.Write([]byte(robotstxt)); err != nil {
+			log.Fatal(err)
+		}
+		file.Close()
+	}
 	fmt.Println("Done")
 }
