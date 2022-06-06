@@ -37,8 +37,6 @@ func makeTagsPage() {
 }
 
 func makeEachTagPage() {
-	replacedTemplate := strings.Replace(template, "./water.css", "../water.css", -1)
-	replacedTemplate = strings.Replace(replacedTemplate, "./tags.html", "../tags.html", -1)
 	for tag, names := range tagMap {
 		file, err := os.Create(filepath.Join(".", "public", fmt.Sprintf("tags/%s.html", tag)))
 		if err != nil {
@@ -52,7 +50,7 @@ func makeEachTagPage() {
 			sb.WriteString(fmt.Sprintf(`<button onclick="location.href='../%s'">%s</button>`, name, strings.TrimSuffix(name, ".html")))
 		}
 		sb.WriteString(`</div>`)
-		if _, err := fmt.Fprintf(file, replacedTemplate, sb.String()); err != nil {
+		if _, err := fmt.Fprintf(file, subTemplate, sb.String()); err != nil {
 			log.Fatal(err)
 		}
 	}
