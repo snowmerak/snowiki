@@ -17,7 +17,9 @@ func makeTagsPage() {
 	for tag := range tagMap {
 		tags = append(tags, tag)
 	}
-	sort.Strings(tags)
+	sort.Slice(tags, func(i, j int) bool {
+		return strings.ToLower(tags[i]) < strings.ToLower(tags[j])
+	})
 	for _, tag := range tags {
 		buttons = append(buttons, fmt.Sprintf(`<button onclick="location.href='./tags/%s.html'">%s</button>`, tag, tag))
 	}
