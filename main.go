@@ -20,6 +20,7 @@ var file_ThirdPartyLicenses []byte
 func main() {
 	wikiName := os.Getenv("WIKI_NAME")
 	siteDomain := os.Getenv("SITE_DOMAIN")
+	lang := os.Getenv("LANG")
 
 	dirs, err := os.ReadDir(filepath.Join(".", "src"))
 	if err != nil {
@@ -69,7 +70,7 @@ func main() {
 		if title == "index" && wikiName != "" {
 			title = wikiName
 		}
-		if _, err := fmt.Fprintf(&buf, template, title, p.data); err != nil {
+		if _, err := fmt.Fprintf(&buf, template, lang, title, p.data); err != nil {
 			log.Fatal(err)
 		}
 		err = m.Minify("text/html", file, &buf)
@@ -97,11 +98,11 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println("create tags.html")
-		makeTagsPage()
+		makeTagsPage(lang)
 	}
 	{
 		fmt.Println("create each tag pages")
-		makeEachTagPage()
+		makeEachTagPage(lang)
 	}
 	{
 		// Create THIRD_PARTY_LICENSES.md

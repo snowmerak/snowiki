@@ -11,7 +11,7 @@ import (
 
 var tagMap = make(map[string][]string)
 
-func makeTagsPage() {
+func makeTagsPage(lang string) {
 	buttons := make([]string, 0, len(tagMap))
 	tags := make([]string, 0, len(tagMap))
 	for tag := range tagMap {
@@ -33,13 +33,13 @@ func makeTagsPage() {
 		sb.WriteString(button)
 	}
 	sb.WriteString(`</div>`)
-	if _, err := fmt.Fprintf(file, template, "Tags", sb.String()); err != nil {
+	if _, err := fmt.Fprintf(file, template, lang, "Tags", sb.String()); err != nil {
 		log.Fatal(err)
 	}
 	siteMap = append(siteMap, "tags.html")
 }
 
-func makeEachTagPage() {
+func makeEachTagPage(lang string) {
 	for tag, names := range tagMap {
 		file, err := os.Create(filepath.Join(".", "public", fmt.Sprintf("tags/%s.html", tag)))
 		if err != nil {
@@ -53,7 +53,7 @@ func makeEachTagPage() {
 			sb.WriteString(fmt.Sprintf(`<button onclick="location.href='../%s'">%s</button>`, name, strings.TrimSuffix(name, ".html")))
 		}
 		sb.WriteString(`</div>`)
-		if _, err := fmt.Fprintf(file, subTemplate, tag, sb.String()); err != nil {
+		if _, err := fmt.Fprintf(file, subTemplate, lang, tag, sb.String()); err != nil {
 			log.Fatal(err)
 		}
 		siteMap = append(siteMap, fmt.Sprintf("tags/%s.html", tag))
